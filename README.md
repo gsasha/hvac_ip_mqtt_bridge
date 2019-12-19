@@ -22,15 +22,15 @@ devices:
 - platform: mqtt
   name: "My Air Conditioner"
   unique_id: "climate.my_ac"
-  power_command_topic: "test/samsungac_mqtt/power/set"
-  mode_state_topic: "test/samsungac_mqtt/mode/state"
-  mode_command_topic: "test/samsungac_mqtt/mode/set"
-  action_topic: "test/samsungac_mqtt/action"
-  fan_mode_state_topic: "test/samsungac_mqtt/fan_mode/state"
+  power_command_topic: "hvac/my_ac/power/set"
+  mode_state_topic: "hvac/my_ac/mode/state"
+  mode_command_topic: "hvac/my_ac/mode/set"
+  action_topic: "hvac/my_ac/action"
+  fan_mode_state_topic: "hvac/my_ac/fan_mode/state"
   fan_mode_command_topic: "test/samsunagc_mqtt/fan_mode/set"
-  temperature_state_topic: "test/samsungac_mqtt/temperature/state"
-  temperature_command_topic: "test/samsungac_mqtt/temperature/set"
-  current_temperature_topic: "test/samsungac_mqtt/current_temperature/state"
+  temperature_state_topic: "hvac/my_ac/temperature/state"
+  temperature_command_topic: "hvac/my_ac/temperature/set"
+  current_temperature_topic: "hvac/my_ac/current_temperature/state"
   precision: 0.1
   retain: false
   initial: 23
