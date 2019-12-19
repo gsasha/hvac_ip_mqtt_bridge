@@ -3,8 +3,8 @@ package loader
 import (
 	"fmt"
 	yaml "github.com/goccy/go-yaml"
-	"hvac"
-	"hvac/models"
+	"github.com/gsasha/hvac_ip_mqtt_bridge/hvac/base"
+	"github.com/gsasha/hvac_ip_mqtt_bridge/hvac/models"
 	"io/ioutil"
 )
 
@@ -32,8 +32,8 @@ type DeviceConfig struct {
 }
 
 type Device struct {
-	mqtt       *hvac.MQTT
-	controller hvac.Controller
+	mqtt       *base.MQTT
+	controller base.Controller
 }
 
 func NewDevice(mqttConfig MQTTConfig, deviceConfig DeviceConfig) (*Device, error) {
@@ -51,7 +51,7 @@ func NewDevice(mqttConfig MQTTConfig, deviceConfig DeviceConfig) (*Device, error
 	}
 	mqttBroker := fmt.Sprintf("%s://%s:%s", protocol, mqttConfig.Host, port)
 	mqttClientId := fmt.Sprintf("hvac_ip_mqtt_bridge_%s", deviceConfig.Name)
-	mqtt := hvac.NewMQTT(mqttBroker, mqttClientId, deviceConfig.MQTTPrefix)
+	mqtt := base.NewMQTT(mqttBroker, mqttClientId, deviceConfig.MQTTPrefix)
 	controller, err := models.NewController(
 		deviceConfig.Model,
 		deviceConfig.Name,

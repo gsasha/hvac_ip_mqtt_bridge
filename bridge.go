@@ -14,7 +14,7 @@ package main
 
 import (
 	"flag"
-	"hvac/loader"
+	"github.com/gsasha/hvac_ip_mqtt_bridge/hvac/loader"
 	"log"
 	"net/http"
 )

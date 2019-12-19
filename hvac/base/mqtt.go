@@ -1,4 +1,4 @@
-package hvac
+package base
 
 import (
 	mqtt "github.com/eclipse/paho.mqtt.golang"

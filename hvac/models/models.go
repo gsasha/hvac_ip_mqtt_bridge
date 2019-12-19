@@ -2,13 +2,13 @@ package models
 
 import (
 	"fmt"
-	"hvac"
-	"hvac/models/samsung"
+	"github.com/gsasha/hvac_ip_mqtt_bridge/hvac/base"
+	"github.com/gsasha/hvac_ip_mqtt_bridge/hvac/models/samsung"
 )
 
 func NewController(
 	model string, name string,
-	host, port, duid, authToken string) (hvac.Controller, error) {
+	host, port, duid, authToken string) (base.Controller, error) {
 	switch model {
 	case "samsungac2878":
 		return samsung.NewSamsungAC2878(name, host, port, duid, authToken), nil

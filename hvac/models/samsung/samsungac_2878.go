@@ -4,7 +4,7 @@ import (
 	"bytes"
 	"encoding/xml"
 	"fmt"
-	"hvac"
+	"github.com/gsasha/hvac_ip_mqtt_bridge/hvac/base"
 	"log"
 	"strings"
 	"text/template"
@@ -18,8 +18,8 @@ type SamsungAC2878 struct {
 	authToken string
 	duid      string
 
-	connection    hvac.Connection
-	stateNotifier hvac.StateNotifier
+	connection    base.Connection
+	stateNotifier base.StateNotifier
 
 	online             bool
 	err                string
@@ -41,12 +41,12 @@ func NewSamsungAC2878(name string, host, port, duid, authToken string) *SamsungA
 		port:       port,
 		authToken:  authToken,
 		duid:       duid,
-		connection: hvac.NewTLSSocketConnection(),
+		connection: base.NewTLSSocketConnection(),
 		attrs:      make(map[string]string),
 	}
 }
 
-func (c *SamsungAC2878) SetStateNotifier(stateNotifier hvac.StateNotifier) {
+func (c *SamsungAC2878) SetStateNotifier(stateNotifier base.StateNotifier) {
 	c.stateNotifier = stateNotifier
 }
 

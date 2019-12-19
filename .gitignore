@@ -5,11 +5,17 @@
 *.so
 *.dylib
 
+# The executable as built
+hvac_ip_mqtt_bridge
+
 # Test binary, built with `go test -c`
 *.test
 
 # Output of the go coverage tool, specifically when used with LiteIDE
 *.out
+
+# Vim swap files
+*.swp
 
 # Dependency directories (remove the comment below to include it)
 # vendor/

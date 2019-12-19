@@ -1,4 +1,4 @@
-package hvac
+package base
 
 type StateNotifier interface {
 	UpdateAction(action string)

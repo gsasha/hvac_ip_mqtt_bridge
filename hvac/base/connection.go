@@ -1,4 +1,4 @@
-package hvac
+package base
 
 import (
 	"crypto/tls"
