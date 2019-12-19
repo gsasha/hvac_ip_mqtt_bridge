@@ -17,5 +17,5 @@ RUN go build -o bridge
 
 EXPOSE 80
 
-CMD ["./bridge --config_file=/data/config.yaml"]
+CMD ["./bridge --config_file=/config/config.yaml"]
 
