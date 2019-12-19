@@ -31,5 +31,5 @@ func main() {
 	for _, device := range devices {
 		device.Run()
 	}
-	http.ListenAndServe(":8090", nil)
+	http.ListenAndServe(":80", nil)
 }
