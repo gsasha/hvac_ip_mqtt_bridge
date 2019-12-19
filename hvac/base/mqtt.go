@@ -3,7 +3,9 @@ package base
 import (
 	"fmt"
 	"log"
+	"crypto/rand"
 	mqtt "github.com/eclipse/paho.mqtt.golang"
+	"encoding/base64"
 )
 
 const (
@@ -62,7 +64,16 @@ func NewMQTT(broker string, clientId string) *MQTT {
 
 	options := mqtt.NewClientOptions()
 	options.AddBroker(broker)
-	options.SetClientID("samsungac_mqtt")
+	random_id := make([]byte, 8)
+	log.Printf("Reading random")
+	_, err := rand.Read(random_id)
+	if err != nil {
+		log.Fatal("Cannot get random for client ID")
+	}
+	clientId = fmt.Sprintf("%s_%s", clientId, base64.StdEncoding.EncodeToString(random_id))
+	log.Printf("MQTT Client ID %s", clientId)
+
+	options.SetClientID(clientId)
 	options.SetOnConnectHandler(func(client mqtt.Client) {
 		log.Printf("Connection established to %s:%s", clientId, broker)
 		m.subscribeTopics()
