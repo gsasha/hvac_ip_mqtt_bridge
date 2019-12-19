@@ -23,7 +23,7 @@ type SamsungAC2878 struct {
 
 	online             bool
 	err                string
-	powerMode         string
+	powerMode          string
 	opMode             string
 	fanMode            string
 	temperature        string

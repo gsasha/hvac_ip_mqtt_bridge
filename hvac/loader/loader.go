@@ -2,11 +2,11 @@ package loader
 
 import (
 	"fmt"
-	"log"
 	yaml "github.com/goccy/go-yaml"
 	"github.com/gsasha/hvac_ip_mqtt_bridge/hvac/base"
 	"github.com/gsasha/hvac_ip_mqtt_bridge/hvac/models"
 	"io/ioutil"
+	"log"
 )
 
 type Config struct {
@@ -89,7 +89,6 @@ func Load(configFile string) ([]*Device, error) {
 	}
 	mqttBroker := fmt.Sprintf("%s://%s:%s", protocol, config.MQTT.Host, port)
 	mqtt := base.NewMQTT(mqttBroker, "hvac_ip_mqtt_bridge")
-	mqtt.Connect()
 
 	var devices []*Device
 	for _, deviceConfig := range config.Devices {
@@ -99,5 +98,6 @@ func Load(configFile string) ([]*Device, error) {
 		}
 		devices = append(devices, device)
 	}
+	mqtt.Connect()
 	return devices, nil
 }

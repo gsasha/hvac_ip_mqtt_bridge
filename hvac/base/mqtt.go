@@ -1,8 +1,9 @@
 package base
 
 import (
-	mqtt "github.com/eclipse/paho.mqtt.golang"
+	"fmt"
 	"log"
+	mqtt "github.com/eclipse/paho.mqtt.golang"
 )
 
 const (
@@ -22,13 +23,13 @@ type MQTT struct {
 	clientId string
 	prefix   string
 
-	client     mqtt.Client
+	client      mqtt.Client
 	controllers map[string]Controller
-	prefixes map[string]string
+	prefixes    map[string]string
 }
 
 type MQTTNotifier struct {
-	mqtt *MQTT
+	mqtt   *MQTT
 	prefix string
 }
 
@@ -54,9 +55,9 @@ func (m *MQTTNotifier) UpdateAttributes(attributes map[string]string) {
 func NewMQTT(broker string, clientId string) *MQTT {
 	log.Printf("Connecting to MQTT broker %s for %s", broker, clientId)
 	m := &MQTT{
-		clientId: clientId,
+		clientId:    clientId,
 		controllers: make(map[string]Controller),
-		prefixes: make(map[string]string),
+		prefixes:    make(map[string]string),
 	}
 
 	options := mqtt.NewClientOptions()
@@ -71,7 +72,6 @@ func NewMQTT(broker string, clientId string) *MQTT {
 	})
 	options.SetAutoReconnect(true)
 
-
 	m.client = mqtt.NewClient(options)
 	return m
 }
@@ -80,7 +80,7 @@ func (m *MQTT) RegisterController(id string, prefix string, controller Controlle
 	m.controllers[id] = controller
 	m.prefixes[id] = prefix
 	return &MQTTNotifier{
-		mqtt:m,
+		mqtt:   m,
 		prefix: prefix,
 	}
 }
@@ -95,38 +95,40 @@ func (m *MQTT) Connect() {
 }
 
 func (m *MQTT) subscribeTopics() {
-	for controllerId, controller := range m.controllers {
-	prefix := m.prefixes[controllerId]
-	tokens := []mqtt.Token{
-		m.client.Subscribe(prefix+"/"+powerCommandTopic, 0,
-			func(client mqtt.Client, message mqtt.Message) {
-				log.Println("Received", message.Topic(), string(message.Payload()))
-				controller.SetPowerMode(string(message.Payload()))
-			}),
-		m.client.Subscribe(prefix+"/"+opModeCommandTopic, 0,
-			func(client mqtt.Client, message mqtt.Message) {
-				log.Println("Received", message.Topic(), string(message.Payload()))
-				controller.SetOpMode(string(message.Payload()))
-			}),
-		m.client.Subscribe(prefix+"/"+fanModeCommandTopic, 0,
-			func(client mqtt.Client, message mqtt.Message) {
-				log.Println("Received", message.Topic(), string(message.Payload()))
-				controller.SetFanMode(string(message.Payload()))
-			}),
-		m.client.Subscribe(prefix+"/"+temperatureCommandTopic, 0,
-			func(client mqtt.Client, message mqtt.Message) {
-				log.Println("Received", message.Topic(), string(message.Payload()))
-				controller.SetTemperature(string(message.Payload()))
-			}),
-		// TODO(gsasha): subscribe to more commands.
-	}
-	for _, token := range tokens {
-		if token.Wait() && token.Error() != nil {
-			log.Printf("Error subscribing to topics: %s", controllerId, token.Error())
-			return
+	for controllerId := range m.controllers {
+		prefix := m.prefixes[controllerId]
+		key := fmt.Sprintf("%s", controllerId)
+		log.Printf("subscribing to prefix %s for %s", prefix, controllerId)
+		tokens := []mqtt.Token{
+			m.client.Subscribe(prefix+"/"+powerCommandTopic, 0,
+				func(client mqtt.Client, message mqtt.Message) {
+					log.Printf("Received %s:%s:%s", key, message.Topic(), string(message.Payload()))
+					m.controllers[key].SetPowerMode(string(message.Payload()))
+				}),
+			m.client.Subscribe(prefix+"/"+opModeCommandTopic, 0,
+				func(client mqtt.Client, message mqtt.Message) {
+					log.Println("Received %s:%s:%s", key, message.Topic(), string(message.Payload()))
+					m.controllers[key].SetOpMode(string(message.Payload()))
+				}),
+			m.client.Subscribe(prefix+"/"+fanModeCommandTopic, 0,
+				func(client mqtt.Client, message mqtt.Message) {
+					log.Println("Received %s:%s:%s", key, message.Topic(), string(message.Payload()))
+					m.controllers[key].SetFanMode(string(message.Payload()))
+				}),
+			m.client.Subscribe(prefix+"/"+temperatureCommandTopic, 0,
+				func(client mqtt.Client, message mqtt.Message) {
+					log.Println("Received %s:%s:%s", key, message.Topic(), string(message.Payload()))
+					m.controllers[key].SetTemperature(string(message.Payload()))
+				}),
+			// TODO(gsasha): subscribe to more commands.
 		}
-	}
-	log.Printf("Subscribed to topics for %s", controllerId)
+		for _, token := range tokens {
+			if token.Wait() && token.Error() != nil {
+				log.Printf("Error subscribing to topics %s: %s", controllerId, token.Error())
+				return
+			}
+		}
+		log.Printf("Subscribed to topics for %s", controllerId)
 	}
 }
 
@@ -148,7 +150,7 @@ func (m *MQTT) updateCurrentTemperature(prefix string, temperature string) {
 func (m *MQTT) updateAttributes(prefix string, attributes map[string]string) {
 	// TODO(gsasha): implement.
 }
-func (m *MQTT) publish(prefix string ,topic string, message string) {
+func (m *MQTT) publish(prefix string, topic string, message string) {
 	log.Println("mqtt publishing", prefix+"/"+topic, message)
 	m.client.Publish(prefix+"/"+topic, 0, false, message)
 }

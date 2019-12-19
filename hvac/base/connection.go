@@ -113,7 +113,7 @@ func (c *TLSSocketConnection) messageLoop() {
 func (c *TLSSocketConnection) SendMessage(message []byte) {
 	conn := c.getConnection()
 	if conn == nil {
-		log.Println("Not connected to %s:%s while trying to send message. Dropping.")
+		log.Printf("Not connected to %s:%s while trying to send message. Dropping.", c.host, c.port)
 		return
 	}
 	conn.SetWriteDeadline(time.Now().Add(writeMaxDuration))
