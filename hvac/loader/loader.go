@@ -36,22 +36,7 @@ type Device struct {
 	controller base.Controller
 }
 
-func NewDevice(mqttConfig MQTTConfig, deviceConfig DeviceConfig) (*Device, error) {
-	protocol := mqttConfig.Protocol
-	if protocol == "" {
-		protocol = "tcp"
-	}
-	host := mqttConfig.Host
-	if host == "" {
-		return nil, fmt.Errorf("MQTT host not given for %s", deviceConfig.Name)
-	}
-	port := mqttConfig.Port
-	if port == "" {
-		port = "1883"
-	}
-	mqttBroker := fmt.Sprintf("%s://%s:%s", protocol, mqttConfig.Host, port)
-	mqttClientId := fmt.Sprintf("hvac_ip_mqtt_bridge_%s", deviceConfig.Name)
-	mqtt := base.NewMQTT(mqttBroker, mqttClientId)
+func NewDevice(mqtt *base.MQTT, deviceConfig DeviceConfig) (*Device, error) {
 	controller, err := models.NewController(
 		deviceConfig.Model,
 		deviceConfig.Name,
@@ -89,9 +74,23 @@ func Load(configFile string) ([]*Device, error) {
 	if config.MQTT == nil {
 		return nil, fmt.Errorf("mqtt missing in configuration")
 	}
+	protocol := config.MQTT.Protocol
+	if protocol == "" {
+		protocol = "tcp"
+	}
+	host := config.MQTT.Host
+	if host == "" {
+		return nil, fmt.Errorf("MQTT host not given")
+	}
+	port := config.MQTT.Port
+	if port == "" {
+		port = "1883"
+	}
+	mqttBroker := fmt.Sprintf("%s://%s:%s", protocol, config.MQTT.Host, port)
+	mqtt := base.NewMQTT(mqttBroker, "hvac_ip_mqtt_bridge")
 	var devices []*Device
 	for _, deviceConfig := range config.Devices {
-		device, err := NewDevice(*config.MQTT, deviceConfig)
+		device, err := NewDevice(mqtt, deviceConfig)
 		if err != nil {
 			return nil, err
 		}
