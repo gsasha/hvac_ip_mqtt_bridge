@@ -28,8 +28,11 @@ func main() {
 	if err != nil {
 		log.Fatalf("Loading failed: %s", err)
 	}
+	log.Printf("Running configured devices")
 	for _, device := range devices {
 		device.Run()
 	}
-	http.ListenAndServe(":80", nil)
+	log.Printf("Listening to HTTP port")
+	http.ListenAndServe(":8080", nil)
+	log.Printf("Done ListenAndServe")
 }

@@ -15,7 +15,7 @@ COPY . .
 
 RUN go build -o bridge
 
-EXPOSE 80
+EXPOSE 8080
 
 CMD ["./bridge", "--config_file=/config/config.yaml"]
 
