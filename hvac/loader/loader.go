@@ -2,6 +2,7 @@ package loader
 
 import (
 	"fmt"
+	"log"
 	yaml "github.com/goccy/go-yaml"
 	"github.com/gsasha/hvac_ip_mqtt_bridge/hvac/base"
 	"github.com/gsasha/hvac_ip_mqtt_bridge/hvac/models"
@@ -45,6 +46,7 @@ func NewDevice(mqtt *base.MQTT, deviceConfig DeviceConfig) (*Device, error) {
 		deviceConfig.DUID,
 		deviceConfig.AuthToken)
 
+	log.Printf("Registering controller %s %s", deviceConfig.Name, deviceConfig.MQTTPrefix)
 	notifier := mqtt.RegisterController(deviceConfig.Name, deviceConfig.MQTTPrefix, controller)
 	controller.SetStateNotifier(notifier)
 
@@ -59,7 +61,6 @@ func NewDevice(mqtt *base.MQTT, deviceConfig DeviceConfig) (*Device, error) {
 
 func (device *Device) Run() {
 	device.controller.Connect()
-	device.mqtt.Connect()
 }
 
 func Load(configFile string) ([]*Device, error) {
@@ -88,6 +89,8 @@ func Load(configFile string) ([]*Device, error) {
 	}
 	mqttBroker := fmt.Sprintf("%s://%s:%s", protocol, config.MQTT.Host, port)
 	mqtt := base.NewMQTT(mqttBroker, "hvac_ip_mqtt_bridge")
+	mqtt.Connect()
+
 	var devices []*Device
 	for _, deviceConfig := range config.Devices {
 		device, err := NewDevice(mqtt, deviceConfig)
