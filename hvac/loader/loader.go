@@ -51,7 +51,7 @@ func NewDevice(mqttConfig MQTTConfig, deviceConfig DeviceConfig) (*Device, error
 	}
 	mqttBroker := fmt.Sprintf("%s://%s:%s", protocol, mqttConfig.Host, port)
 	mqttClientId := fmt.Sprintf("hvac_ip_mqtt_bridge_%s", deviceConfig.Name)
-	mqtt := base.NewMQTT(mqttBroker, mqttClientId, deviceConfig.MQTTPrefix)
+	mqtt := base.NewMQTT(mqttBroker, mqttClientId)
 	controller, err := models.NewController(
 		deviceConfig.Model,
 		deviceConfig.Name,
@@ -60,8 +60,8 @@ func NewDevice(mqttConfig MQTTConfig, deviceConfig DeviceConfig) (*Device, error
 		deviceConfig.DUID,
 		deviceConfig.AuthToken)
 
-	mqtt.SetController(controller)
-	controller.SetStateNotifier(mqtt)
+	notifier := mqtt.RegisterController(deviceConfig.Name, deviceConfig.MQTTPrefix, controller)
+	controller.SetStateNotifier(notifier)
 
 	if err != nil {
 		return nil, err
