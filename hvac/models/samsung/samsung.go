@@ -24,7 +24,7 @@ func fromAc(value string, table []translationEntry) string {
 			return e.mqtt
 		}
 	}
-	return value
+	return strings.ToLower(value)
 }
 
 var powerModeTable = []translationEntry{
