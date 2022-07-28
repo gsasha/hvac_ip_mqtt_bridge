@@ -28,6 +28,7 @@ type SamsungAC2878 struct {
 	fanMode            string
 	temperature        string
 	currentTemperature string
+	purifyMode	   string
 	attrs              map[string]string
 }
 
@@ -78,6 +79,9 @@ var (
 	setTemperatureTemplate = template.Must(template.New("setTemperature").Parse(
 		`<Request Type="DeviceControl"><Control CommandID="AC_FUN_TEMPSET" DUID="{{.duid}}"><Attr ID="AC_FUN_TEMPSET" Value="{{.value}}" /></Control></Request>
 `))
+	setPurifyModeTemplate = template.Must(template.New("setPurifyMode").Parse(
+		`<Request Type="DeviceControl"><Control CommandID="AC_ADD_SPI" DUID="{{.duid}}"><Attr ID="AC_ADD_SPI" Value="{{.value}}" /></Control></Request>
+`))
 )
 
 func (c *SamsungAC2878) SetPowerMode(powerMode string) {
@@ -111,6 +115,13 @@ func (c *SamsungAC2878) SetFanMode(fanMode string) {
 func (c *SamsungAC2878) SetTemperature(temperature string) {
 	c.sendMessage(setTemperatureTemplate, map[string]string{
 		"value": temperature,
+		"duid":  c.duid,
+	})
+}
+
+func (c *SamsungAC2878) SetPurifyMode(purifyMode string) {
+	c.sendMessage(setPurifyModeTemplate, map[string]string{
+		"value": purifyMode,
 		"duid":  c.duid,
 	})
 }
@@ -261,6 +272,7 @@ func (c *SamsungAC2878) notifyState() {
 	c.stateNotifier.UpdateFanMode(FanModeFromAC(c.fanMode))
 	c.stateNotifier.UpdateTemperature(c.temperature)
 	c.stateNotifier.UpdateCurrentTemperature(c.currentTemperature)
+	c.stateNotifier.UpdatePurifyMode(c.purifyMode)
 	c.stateNotifier.UpdateAttributes(c.attrs)
 }
 
@@ -278,6 +290,8 @@ func (c *SamsungAC2878) handleAttributes(attrs []Attr) {
 			c.currentTemperature = attr.Value
 		case "AC_FUN_WINDLEVEL":
 			c.fanMode = attr.Value
+		case "AC_ADD_SPI":
+			c.purifyMode = attr.Value
 		}
 	}
 }
