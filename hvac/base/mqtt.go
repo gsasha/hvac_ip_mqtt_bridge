@@ -19,6 +19,10 @@ const (
 	temperatureStateTopic        = "temperature/state"
 	fanModeCommandTopic          = "fan_mode/set"
 	fanModeStateTopic            = "fan_mode/state"
+	purifyModeCommandTopic	     = "purify_mode/set"
+	purifyModeStateTopic	     = "purify_mode/state"
+	swingModeCommandTopic	     = "swing_mode/set"
+	swingModeStateTopic	     = "swing_mode/state"
 )
 
 type MQTT struct {
@@ -49,6 +53,12 @@ func (m *MQTTNotifier) UpdateTemperature(temperature string) {
 }
 func (m *MQTTNotifier) UpdateCurrentTemperature(temperature string) {
 	m.mqtt.updateCurrentTemperature(m.prefix, temperature)
+}
+func (m *MQTTNotifier) UpdatePurifyMode(purifyMode string) {
+	m.mqtt.updatePurifyMode(m.prefix, purifyMode)
+}
+func (m *MQTTNotifier) UpdateSwingMode(swingMode string) {
+	m.mqtt.updateSwingMode(m.prefix, swingMode)
 }
 func (m *MQTTNotifier) UpdateAttributes(attributes map[string]string) {
 	m.mqtt.updateAttributes(m.prefix, attributes)
@@ -131,6 +141,16 @@ func (m *MQTT) subscribeTopics() {
 					log.Println("Received %s:%s:%s", key, message.Topic(), string(message.Payload()))
 					m.controllers[key].SetTemperature(string(message.Payload()))
 				}),
+			m.client.Subscribe(prefix+"/"+purifyModeCommandTopic, 0,
+				func(client mqtt.Client, message mqtt.Message) {
+					log.Println("Received %s:%s:%s", key, message.Topic(), string(message.Payload()))
+					m.controllers[key].SetPurifyMode(string(message.Payload()))
+				}),
+			m.client.Subscribe(prefix+"/"+swingModeCommandTopic, 0,
+				func(client mqtt.Client, message mqtt.Message) {
+					log.Println("Received %s:%s:%s", key, message.Topic(), string(message.Payload()))
+					m.controllers[key].SetSwingMode(string(message.Payload()))
+				}),
 			// TODO(gsasha): subscribe to more commands.
 		}
 		for _, token := range tokens {
@@ -157,6 +177,12 @@ func (m *MQTT) updateTemperature(prefix string, temperature string) {
 }
 func (m *MQTT) updateCurrentTemperature(prefix string, temperature string) {
 	m.publish(prefix, currentTemperatureStateTopic, temperature)
+}
+func (m *MQTT) updatePurifyMode(prefix string, purifyMode string) {
+	m.publish(prefix, purifyModeStateTopic, purifyMode)
+}
+func (m *MQTT) updateSwingMode(prefix string, swingMode string) {
+	m.publish(prefix, swingModeStateTopic, swingMode)
 }
 func (m *MQTT) updateAttributes(prefix string, attributes map[string]string) {
 	// TODO(gsasha): implement.

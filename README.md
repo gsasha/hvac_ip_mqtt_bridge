@@ -31,6 +31,13 @@ devices:
   temperature_state_topic: "hvac/my_ac/temperature/state"
   temperature_command_topic: "hvac/my_ac/temperature/set"
   current_temperature_topic: "hvac/my_ac/current_temperature/state"
+  swing_mode_state_topic: "hvac/my_ac/swing_mode/state"
+  swing_mode_command_topic: "hvac/my_ac/swing_mode/set"
+  swing_modes:
+    - "Fixed"
+    - "SwingLR"
+    - "SwingUD"
+    - "Rotation"
   precision: 0.1
   retain: false
   initial: 23
